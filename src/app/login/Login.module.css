@@ -1,0 +1,243 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+@import '../globals.css';
+
+html, body{
+    display: grid;
+    height: 100%;
+    width: 100%;
+    place-items: center;
+    background: var(--backgroun-page-linear);
+    background: var(--backgroun-page-webkit);
+}
+
+.wrapper {
+    overflow: hidden;
+    max-width: 390px;
+    background: var(--block-background);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0px 15px 20px rgba(0, 0, 0, 0.1);
+    font-family: 'Poppins', sans-serif;
+    transition:  0.6s ease-in-out;
+}
+
+.title_text {
+    display: flex;
+    width: 200%;
+}
+
+.title {
+    width: 50%;
+    font-size: 35px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    color: #000000;
+}
+
+.slide_controls {
+    position: relative;
+    display: flex;
+    height: 50px;
+    width: 100%;
+    overflow: hidden;
+    margin: 30px 0 10px 0;
+    justify-content: space-between;
+    border: 1px solid lightgrey;
+    border-radius: 15px;
+}
+
+.slide {
+    height: 100%;
+    width: 100%;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    text-align: center;
+    line-height: 48px;
+    cursor: pointer;
+    z-index: 1;
+    transition: all 0.6s ease;
+}
+
+.slider_tab {
+    position: absolute;
+    height: 100%;
+    width: 50%;
+    left: 0;
+    z-index: 0;
+    border-radius: 15px;
+    background: var(--accent-liner);
+    transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.login_btn,
+.register_btn {
+    display: none;
+}
+
+.register_btn:checked~.slider_tab {
+    left: 50%;
+}
+
+.register_btn:checked~.register {
+    color: #fff;
+    cursor: default;
+    user-select: none;
+}
+
+.register_btn:checked~.login {
+    color: #000;
+}
+
+.login_btn:checked~.register {
+    color: #000;
+}
+
+.login_btn:checked~.login {
+    cursor: default;
+    user-select: none;
+}
+
+.form_container {
+    width: 100%;
+    overflow: hidden;
+}
+
+.form_inner {
+    display: flex;
+    width: 200%;
+}
+
+.form_container form {
+    width: 50%;
+    transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+form .field {
+    position: relative;
+    height: 50px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+form .field input {
+    background-color: #fff;
+    height: 100%;
+    width: 100%;
+    outline: none;
+    padding-left: 15px;
+    border-radius: 15px;
+    border: 1px solid lightgrey;
+    border-bottom-width: 2px;
+    font-size: 17px;
+    color: #000000; 
+    transition: all 0.3s ease;
+}
+
+.form_inner form .field input:focus{
+    border-color: var(--accent);
+}
+
+.form_inner form .field input::placeholder{
+    color: #999;
+    transition: all 0.3s ease;
+  }
+form .field input:focus::placeholder{
+    color: var(--accent);
+}
+
+.eye_icon {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 1.2rem;
+  user-select: none;
+  color: var(--accent);
+}
+
+.error{
+    position: relative;
+    text-align: center;
+    font-size: 16;
+    margin-top: 1rem;
+    font-weight: 500;
+    z-index: 10-0;
+    color: rgba(255, 0, 0, 0.750);
+    animation: slideUpDown 2s ease-in-out forwards;
+}
+
+@keyframes slideUpDown {
+	0% {
+		transform: translate(0, 100%);
+		opacity: 0;
+	}
+
+    25% {
+		transform: translate(0, 0);
+		opacity: 1;
+	}
+
+    75% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(0, 100%);
+        opacity: 0;
+    }
+}
+
+.forget{
+    margin-top: 1rem;
+    color: var(--accent);
+    font-weight: 500;
+    text-decoration: none;
+    display: flex;
+    width: 100%;
+    font-size: 16px;
+    justify-content: flex-start;
+}
+
+.submitbtn{
+    margin-top: 1rem;
+    width: 100%;
+    height: 50px;
+    color: #fff;
+    outline: none;
+    border: none;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    background: var(--accent-liner);
+    border-radius: 15px;
+    transition: all 0.4s ease;;
+}
+.submitbtn:hover{
+    transform: translateY(-2px);
+    opacity: 0.9;
+    box-shadow: 0px 2px 10px #0000002c;
+}
+.text{
+    color: #000;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 1rem;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    
+}
+
+.text_link{
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    margin-left: 0.25rem;
+    cursor: pointer;
+}
