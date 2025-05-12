@@ -1,0 +1,18 @@
+.container {
+  z-index: 999;
+  background-color: var(--container);
+  position: fixed;           
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -100%); 
+  
+  width: 40vw;
+  height: 40vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: var(--gray) solid 1px;
+  border-radius: 2rem;
+  box-shadow: rgba(0, 0, 0, 0.20) 0px 1px 5px;
+
+}
