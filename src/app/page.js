@@ -5,20 +5,19 @@ import styles from "./page.module.css";
 import { useContext, useEffect } from 'react';
 import { useRouter }          from 'next/navigation';
 import { AuthContext }        from '../context/AuthContext';
-import DashboardPage from "./pages/DashboardPage";
 
 export default function Home() {
   const { user, loading } = useContext(AuthContext);
   const router = useRouter();
   useEffect(() => {
-    if (!loading && !user) {
+  if (!loading) {
+    if (user) {
+      router.push('/dashboard');
+    } else {
       router.push('/login');
     }
-  }, [loading, user, router]);
-
-  if (loading || !user) {
-    return <div>Loading...</div>;
   }
+}, [loading, user, router]);
 
-  return <DashboardPage />;
+  return <div>Loading...</div>;
 }

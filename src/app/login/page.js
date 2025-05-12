@@ -2,7 +2,8 @@
 import styles from "./Login.module.css";
 import{ useEffect, useState } from 'react';
 import { auth } from '../../firebase';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword} from 'firebase/auth';
+import { getFirestore, doc, setDoc, serverTimestamp} from "firebase/firestore";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -39,16 +40,27 @@ export default function Login() {
   };
   const handleSubmitRegister = async e => {
     e.preventDefault();
-    try {
-      if(Rpass !== RCpass){
-        setError('Passwords do not match');
-        setTimeout(() => {
-          setError(false);
-        }, 2000);
-        return;
-      }
 
-      await createUserWithEmailAndPassword(auth, Remail, Rpass);
+    if(Rpass !== RCpass){
+      setError('Passwords do not match');
+      setTimeout(() => {
+        setError(false);
+      }, 2000);
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, Remail, Rpass);
+      const user = userCredential.user;
+      const db = getFirestore();
+
+      await setDoc(doc(db, "users", user.uid), {
+        userName: 'User',
+        balance: 0.00,
+        isPremium: false,
+        createdAt: serverTimestamp(),
+      },{ merge: true });
+
       router.push('/');
       
     } catch (e){showError(e.message);};
