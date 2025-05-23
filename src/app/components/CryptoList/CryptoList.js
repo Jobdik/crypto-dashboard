@@ -3,7 +3,7 @@ import styles from "./CryptoList.module.css";
 
 import { useEffect, useState } from "react";
 
-import { getCryptos } from "../../services/cryptoService";
+import { getCryptos } from "../../services/API/cryptoService";
 
 const CryptoList = () => {
     const [cryptos, setCryptos] = useState([]);

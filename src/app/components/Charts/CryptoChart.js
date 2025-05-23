@@ -5,7 +5,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 const data = [{name: 'Page A', uv: 400, pv: 2400, amt: 2400}];
 
 import { useEffect, useState } from "react";
-import { getCryptoHistory } from "../../services/cryptoService";
+import { getCryptoHistory } from "../../services/API/cryptoService";
 import {formatChartData} from "../../services/formatDate";
 
 
