@@ -1,45 +1,78 @@
 import styles from "./BasicInformation.module.css";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 import {getCryptoFavorite, getCryptoTopGainersLosers, getCryptoNewListings} from "@/app/services/API/cryptoService";
+
+import { MdFavorite, MdFavoriteBorder } from "react-icons/md";
+import { FaViacoin } from "react-icons/fa";
 
 
 // BasicInformation component: displays asset overview with filtering modes and loading/error handling
 const BasicInformation = (uid) => {
     // State for fetched data (favorites, top traders, gainers, etc.)
-    const [data, setData] = useState([{name: 'Bitcoin',symbol: 'BTC',image: 'https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1547033579',current_price: 40000,total_volume: 4000,price_change_percentage_24h: -2,market_cap_change_percentage_24h: -5},
-        {name: 'Bitcoin',symbol: 'BTC',image: 'https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1547033579',current_price: 40000,total_volume: 4000,price_change_percentage_24h: -2,market_cap_change_percentage_24h: -5},
-        {name: 'Bitcoin',symbol: 'BTC',image: 'https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1547033579',current_price: 40000,total_volume: 4000,price_change_percentage_24h: -2,market_cap_change_percentage_24h: -5},
-        {name: 'Bitcoin',symbol: 'BTC',image: 'https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1547033579',current_price: 40000,total_volume: 4000,price_change_percentage_24h: -2,market_cap_change_percentage_24h: -5},
-    ]);
+    const [data, setData] = useState([]);
     // Mode controls which dataset to fetch/display
-    const [mode, setMode] = useState('favorites');
+    const [mode, setMode] = useState('');
     // Loading indicator state
     const [loading, setLoading] = useState(false);
     // Error state for fetch failures
     const [error, setError] = useState(null);
 
+    const [favorite, setFavorite] = useState([]);
+
+    const [rowsToShow, setRowsToShow] = useState(4);
+
     // Effect to fetch data whenever 'mode' changes
-    useEffect(() => {
-        setLoading(false);
+    const fetchData = useCallback(async () => {
+        setLoading(true);
         setError(null);
-        // Placeholder: switch on mode to call appropriate fetch function
-        switch (mode) {
-            case 'favorites': 
-                break;
-            case 'top_tradet':
-                break;
-            case 'top_gainers':
-                break;
-            case 'top_loosers':
-                break;
-            case 'newly_listed':
-                break;
-            default:
-                break;
+
+        try {
+            let result = [];
+            switch(mode){
+                case 'favorites':
+                    result = await getCryptoFavorite(uid) || [];
+                    break;
+                case 'top_tradet':
+                    break;
+                case 'top_gainers':
+                    result = await getCryptoTopGainersLosers() || [];
+                    break;
+                case 'top_loosers':
+                    result = await getCryptoTopGainersLosers() || [];
+                    break;
+                case 'new_listings':
+                    result = await getCryptoNewListings() || [];
+                    break;
+                default:
+                    result = [];
+                    break;
+            }
+           setData(result);
+        
+        }   
+        catch (error) {
+            setError('Failed to fetch crypto data:' + error);
+        } 
+        finally {
+            setLoading(false);
+            setRowsToShow(4);
         }
-    }, [mode]);
+    }, [mode, uid]);
+    
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+    
+
+    const toggleFavorite = (id) => {
+       setData((prevData) => prevData.map((item) => item.id === id ? {...item, Favorite: !item.Favorite} : item));
+    };
+
+    // Slice the data to show only the specified number of rows
+    const visibleData = data.slice(0, rowsToShow);
+    
     return (
         <div className={styles.container}>
             {/* Mode selection buttons */}
@@ -52,6 +85,7 @@ const BasicInformation = (uid) => {
                     <button className={styles.button} onClick={() => setMode('newly_listed')}>Newly listed</button>
                 </div>
             </div>
+            {/* Loading indicator */}
             {loading && 
                     <div className={styles.loading_wrapper}>
                         <div className={styles.loading_pills}></div>
@@ -65,39 +99,64 @@ const BasicInformation = (uid) => {
 
             
             {/* Table header columns */}
-            {!loading && !error &&
-                <>
-                    <div className={styles.top_colums_container}>
-                        <div className={styles.column_container}><span>Asset</span></div>
-                        <div className={styles.column_container}><span>Price</span></div>
-                        <div className={styles.column_container}><span>24h price change</span></div>
-                        <div className={styles.column_container}><span>24h cap change</span></div>
-                        <div className={styles.column_container}><span>Volume</span></div>
-                    </div> 
-                    <div className={styles.rows_container}>
-                        {/* Placeholder: display fetched data here */}
+            {!loading && !error && (<>
+                <table className={styles.table}>
+                    <thead>
+                        <tr className={styles.table_header}>
+                            <th>Asset</th>
+                            <th>Price</th>
+                            <th>24h price change</th>
+                            <th>24h cap change</th>
+                            <th>Volume</th>
+                        </tr>
+                    </thead>
+
+                    {/* Table body rows */}
+                    <tbody className={styles.table_body}>
+                        {/* if there are no data, show a fallback message */}
+                        {/* if there are data, show the rows */}
+                        { visibleData.length === 0 ? (
+                            <tr className={styles.row}>
+                                <td colSpan="5" className={styles.no_data}>No data available</td>
+                            </tr>
+                        ):(
                             
-                        {!loading && !error && data.length === 0 && (
-                            <p>No data available for mode: {mode}</p>
+                            visibleData.map((item, idx) => ( 
+                               <tr key={idx} className={styles.row}>
+                                    <td ><div className={styles.row_asset_div}>
+                                        <img src={item.image} alt={item.name} className={styles.row_asset_img} />
+                                        <div className={styles.row_asset_info}>
+                                            <span>{item.name}</span>
+                                            <span>{item.symbol}</span>
+                                        </div>    
+                                    </div></td>
+                                    <td>{item.current_price}</td>
+                                    <td>{item.price_change_percentage_24h} %</td>
+                                    <td>{item.market_cap_change_percentage_24h} %</td>
+                                    <td className={styles.row_volume}>
+                                        <div className={styles.row_volume_wrapper}>
+                                           {item.total_volume}
+                                           {mode === 'favorites' && 
+                                                <div className={styles.row_volume_button}>
+                                                    <button className={styles.row_button_favorite} onClick={() => {toggleFavorite(item.id)}}>{item.favorite ? <MdFavorite /> : <MdFavoriteBorder />}</button>
+                                                </div>
+                                           }
+                                        </div>
+                                    </td>
+                                </tr> 
+                            ))
                         )}
-                        {!loading && !error && data.map((item, idx) => (
-                            <div key={idx} className={styles.row}>
-                                <div className={styles.row_asset_div}>
-                                    <img className={styles.row_asset_img} src={item.image} />
-                                    <div className={styles.row_asset_info}>
-                                        <span>{item.name}</span>
-                                        <span>{item.symbol}</span>
-                                    </div>
-                                </div>
-                                <div className={styles.component_row}>{item.current_price}</div>
-                                <div className={styles.component_row}>{item.price_change_percentage_24h}</div>
-                                <div className={styles.component_row}>{item.market_cap_change_percentage_24h}</div>
-                                <div className={styles.component_row}>{item.total_volume}</div>
-                            </div>
-                        ))}
+                       
+                    </tbody>
+                </table>
+
+                {/* Show more button */}
+                {!loading && !error && data.length !== 0 && rowsToShow < data.length  (
+                    <div className={styles.show_more_container}>
+                        <button className={styles.show_more_button} onClick={rowsToShow > 4 ? () => setRowsToShow(rowsToShow + 6) : () => setRowsToShow(rowsToShow-6)}>Show More</button>
                     </div>
-                </>
-            }
+                )}
+            </>)}
         </div>
     );
 }
