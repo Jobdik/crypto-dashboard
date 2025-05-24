@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-import PortfolioChartBlock from "../components/Charts/PortfolioChartBlock/PortfolioChartBlock";
-
 import NavBar from "../components/Navbar/NavBar";
+import PortfolioChartBlock from "../components/Charts/PortfolioChartBlock/PortfolioChartBlock";
+import BasicInformation from "../components/Containers/BasicInformation/BasicInformation";
 
 // DashboardPage: main page displaying navbar, portfolio chart, and general info widgets
 const DashboardPage = () => {
@@ -41,6 +41,11 @@ const DashboardPage = () => {
           <div className={styles.nft_div}></div>
         </div>
       </div>
+
+      <div className={styles.bottom_left_container}>
+        <BasicInformation uid={user.uid}/>
+      </div>
+      
     </>
   );
 };
