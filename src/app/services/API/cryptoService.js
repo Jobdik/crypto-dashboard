@@ -1,7 +1,8 @@
 import Axios from 'axios';
+import axiosRateLimit from 'axios-rate-limit';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
-// Base URL for CoinGecko public API endpoint
-const API_URL = 'https://api.coingecko.com/api/v3';
+// Base URL for CoinGecko public API endpoint and rate limiter
+const hhtp = axiosRateLimit(Axios.create( { baseURL: 'https://api.coingecko.com/api/v3' } ), { maxRequests: 5, perMilliseconds: 5000 });
 
 /**
  * Fetches current USD prices for an array of cryptocurrency IDs
@@ -13,8 +14,8 @@ export const getCtyptoPrices = async (symbol = []) => {
   if(!symbol) return null;
   // Build comma-separated list of IDs
   try{
-    const response = await Axios.get(
-      `${API_URL}/simple/price`,
+    const response = await hhtp.get(
+      `/simple/price`,
       {
         params: {
           vs_currencies: 'usd',
@@ -40,8 +41,8 @@ export const getCryptoInfos = async (symbol) => {
    // If no symbols provided, nothing to fetch
   if(!symbol) return null;
   try{
-    const response = await Axios.get(
-      `${API_URL}/coins/markets`,
+    const response = await hhtp.get(
+      `/coins/markets`,
       {
         params: {
           vs_currency: 'usd',
@@ -72,8 +73,8 @@ export const getCryptoFavorite = async (uid) => {
       // Limit to the first 10 favorite coins
       const ids = favorite.slice(0, 10).join(',');
       // Fetch market data for the selected coins from CoinGecko API
-      const response = await Axios.get(
-        `${API_URL}/coins/markets`,
+      const response = await hhtp.get(
+        `/coins/markets`,
         {
           params: {
             vs_currency: 'usd',
@@ -91,7 +92,8 @@ export const getCryptoFavorite = async (uid) => {
         current_price: coin.current_price,
         total_volume: coin.total_volume,
         price_change_percentage_24h: coin.price_change_percentage_24h,
-        market_cap_change_percentage_24h: coin.market_cap_change_percentage_24h
+        market_cap_change_percentage_24h: coin.market_cap_change_percentage_24h,
+        favorite: true
       }));
       return filteredData || [];
     }
@@ -107,8 +109,8 @@ export const getCryptoFavorite = async (uid) => {
 
 export const getCryptoTopGainersLosers = async () => {
   try {
-    const response = await Axios.get(
-      `${API_URL}/coins/markets`,
+    const response = await hhtp.get(
+      `/coins/markets`,
       {
         params: {
           vs_currency: 'usd',
@@ -129,7 +131,7 @@ export const getCryptoTopGainersLosers = async () => {
       image: coin.image,
       total_volume: coin.total_volume,
       price_change_percentage_24h: coin.price_change_percentage_24h,
-      market_cap_change_percentage_24h: coin.market_cap_change_percentage_24h
+      market_cap_change_percentage_24h: coin.market_cap_change_percentage_24h, 
     }));
     // Sort data by increasing price_change_percentage_24h  
     filteredData.sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h);
@@ -138,7 +140,6 @@ export const getCryptoTopGainersLosers = async () => {
     const topGainers = filteredData.slice(0, 10);
     const topLosers = filteredData.slice(-10);
     
-
     return { topGainers, topLosers } || [];
 
   }
@@ -151,8 +152,8 @@ export const getCryptoTopGainersLosers = async () => {
 
 export const getCryptoNewListings = async () => {
   try {
-    const response = await Axios.get(
-      `${API_URL}/coins/markets`,
+    const response = await hhtp.get(
+      `/coins/markets`,
       {
         params: {
           vs_currency: 'usd',
@@ -170,7 +171,7 @@ export const getCryptoNewListings = async () => {
       image: coin.image,
       total_volume: coin.total_volume,
       price_change_percentage_24h: coin.price_change_percentage_24h,
-      market_cap_change_percentage_24h: coin.market_cap_change_percentage_24h
+      market_cap_change_percentage_24h: coin.market_cap_change_percentage_24h,
     }))
     return filteredData || [];
   }
