@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Crypto Dashboard
 
-## Getting Started
+A modern Next.js dashboard application for tracking and exploring cryptocurrency market data. Fetches real-time prices, top gainers/losers, newly listed assets, and allows you to manage a list of favorite coins.
 
-First, run the development server:
+
+## Tech Stack
+
+**Framework:** Next.js (App Router)
+
+**UI:** React
+
+**HTTP Client:** Axios + axios-rate-limit
+
+**API:** CoinGecko public API
+
+
+## Features
+
+- Real-time Data: Fetch current prices from the CoinGecko API.
+- Rate-Limited API Calls: Prevent hitting API limits with axios-rate-limit.
+- Authorization Forms: Complete user registration flow with user verification.
+- Data Storage Structure: Established foundational data storage architecture (to be extended).
+- Core Mechanics: Implemented primary logic for storing and managing cryptocurrency information.
+- Interactive Portfolio: Interactive display of current assets in the user’s portfolio.
+- General Info Component: Component for presenting categorized general information about cryptocurrencies.
+- Responsive Design: Mobile-first, responsive UI that adapts to all screen sizes.
+
+
+## Planned Features
+These enhancements are on the roadmap for upcoming versions:
+
+- Portfolio Dashboard: Manage and visualize your current crypto holdings in a unified dashboard view.
+
+- Trend Analysis: Interactive charts to view historical price trends and performance metrics for selected assets.
+
+- Price Alerts: Configure notifications for significant price drops or spikes in your portfolio or selected cryptocurrencies.
+
+- News Feed: Display the latest news articles and updates related to the cryptocurrency market, sourced from public news APIs.
+
+- Persistent Favorites: Save user favorites to backend service to retain preferences across sessions.
+## Run Locally
+
+Clone the project
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+    git clone https://github.com/Jobdik/crypto-dashboard.git
+    cd crypto-dashboard
+```
+Install dependencies:
+```bash
+    npm install
+    # or
+    yarn
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Environment Variables:
+Create a .env.local file in the project root to override the default API URL if needed:
 
-## Learn More
+```bash
+    NEXT_PUBLIC_API_URL=https://api.coingecko.com/api/v3
+```
 
-To learn more about Next.js, take a look at the following resources:
+Running Locally
+```bash
+    npm run dev
+    # or
+    yarn dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Authors
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [@Jobdik](https://github.com/Jobdik)
