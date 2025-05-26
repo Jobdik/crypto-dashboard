@@ -1,0 +1,23 @@
+.button_favorite_div{
+    margin-left: auto;
+    margin-right:0.75rem
+}
+
+.button_favorite{
+    background-color: inherit;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    user-select: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: all 0.3s ease-in-out;
+    scale: 1.25;
+}
+
+.button_favorite:hover{
+    transform: scale(1.05);
+}
