@@ -1,8 +1,14 @@
 import Axios from 'axios';
 import axiosRateLimit from 'axios-rate-limit';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, Timestamp } from 'firebase/firestore';
 // Base URL for CoinGecko public API endpoint and rate limiter
 const hhtp = axiosRateLimit(Axios.create( { baseURL: 'https://api.coingecko.com/api/v3' } ), { maxRequests: 5, perMilliseconds: 5000 });
+
+// Cashe to avoid an overabundance of requests to the free api 
+let _cashe = {
+  Timestamp : 0,
+  data: null,
+};
 
 /**
  * Fetches current USD prices for an array of cryptocurrency IDs
@@ -106,8 +112,17 @@ export const getCryptoFavorite = async (uid) => {
   }
 
 };
+/**
+ * Fetches market data for the top gainers or losers
+ * @param {string} type - 'gainers' or 'losers'
+ * @returns {Promise<object> || null}
+ */
+export const getCryptoTopGainersLosers = async (type) => {
+  const date = Date.now();
 
-export const getCryptoTopGainersLosers = async () => {
+  // if it has not been more than 60 seconds since the last update, it returns the old data
+  if(_cashe.data && date - _cashe.Timestamp < 60000) return sliceByType(_cashe.data, type);
+
   try {
     const response = await hhtp.get(
       `/coins/markets`,
@@ -128,6 +143,7 @@ export const getCryptoTopGainersLosers = async () => {
       id: coin.id,
       name: coin.name,
       symbol: coin.symbol,
+      current_price: coin.current_price,
       image: coin.image,
       total_volume: coin.total_volume,
       price_change_percentage_24h: coin.price_change_percentage_24h,
@@ -135,19 +151,30 @@ export const getCryptoTopGainersLosers = async () => {
     }));
     // Sort data by increasing price_change_percentage_24h  
     filteredData.sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h);
-
-    // Return top 10 gainers and top 10 losers
-    const topGainers = filteredData.slice(0, 10);
-    const topLosers = filteredData.slice(-10);
     
-    return { topGainers, topLosers } || [];
 
+    // Update cashe
+    _cashe = {
+      Timestamp : date,
+      data: filteredData,
+    };
+
+    // Return top 10 gainers and top 10 losers 
+    return sliceByType(filteredData, type);
   }
   catch (error) {
    console.log("Error in getCryptoTopGainersLosers:",error);
    return null; 
   }
 };
+
+
+// Slicing date by type function
+function sliceByType(filteredData, type){
+  if(type === 'gainers') return (filteredData ?? []).slice(0, 10);
+  else if(type === 'losers') return (filteredData ?? []).slice(-10).reverse();
+  return [];
+}
 
 
 export const getCryptoNewListings = async () => {
@@ -169,6 +196,7 @@ export const getCryptoNewListings = async () => {
       name: coin.name,
       symbol: coin.symbol,
       image: coin.image,
+      current_price: coin.current_price,
       total_volume: coin.total_volume,
       price_change_percentage_24h: coin.price_change_percentage_24h,
       market_cap_change_percentage_24h: coin.market_cap_change_percentage_24h,
