@@ -1,74 +1,22 @@
 import styles from "./BasicInformation.module.css";
 
-import { useEffect, useState, useCallback } from "react";
+import {useEffect, useState } from "react";
 
-import {getCryptoFavorite, getCryptoTopGainersLosers, getCryptoNewListings} from "@/app/services/API/cryptoService";
-
-import { MdFavorite, MdFavoriteBorder } from "react-icons/md";
-import { FaViacoin } from "react-icons/fa";
-
+import useCryptoData from "@/app/hooks/useCryptoData";
+import ToggleFavorite from "@/app/components/Favorite/ToggleFavorite";
 
 // BasicInformation component: displays asset overview with filtering modes and loading/error handling
-const BasicInformation = (uid) => {
-    // State for fetched data (favorites, top traders, gainers, etc.)
-    const [data, setData] = useState([]);
+const BasicInformation = ({uid}) => {
     // Mode controls which dataset to fetch/display
-    const [mode, setMode] = useState('');
-    // Loading indicator state
-    const [loading, setLoading] = useState(false);
-    // Error state for fetch failures
-    const [error, setError] = useState(null);
+    const [mode, setMode] = useState('top_gainers');
 
-    const [favorite, setFavorite] = useState([]);
+    const { data, loading, error } = useCryptoData({ mode, uid });
 
     const [rowsToShow, setRowsToShow] = useState(4);
 
-    // Effect to fetch data whenever 'mode' changes
-    const fetchData = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-
-        try {
-            let result = [];
-            switch(mode){
-                case 'favorites':
-                    result = await getCryptoFavorite(uid) || [];
-                    break;
-                case 'top_tradet':
-                    break;
-                case 'top_gainers':
-                    result = await getCryptoTopGainersLosers() || [];
-                    break;
-                case 'top_loosers':
-                    result = await getCryptoTopGainersLosers() || [];
-                    break;
-                case 'new_listings':
-                    result = await getCryptoNewListings() || [];
-                    break;
-                default:
-                    result = [];
-                    break;
-            }
-           setData(result);
-        
-        }   
-        catch (error) {
-            setError('Failed to fetch crypto data:' + error);
-        } 
-        finally {
-            setLoading(false);
-            setRowsToShow(4);
-        }
-    }, [mode, uid]);
-    
     useEffect(() => {
-        fetchData();
-    }, [fetchData]);
-    
-
-    const toggleFavorite = (id) => {
-       setData((prevData) => prevData.map((item) => item.id === id ? {...item, Favorite: !item.Favorite} : item));
-    };
+        setRowsToShow(4);
+    }, [mode]);
 
     // Slice the data to show only the specified number of rows
     const visibleData = data.slice(0, rowsToShow);
@@ -81,8 +29,8 @@ const BasicInformation = (uid) => {
                     <button className={styles.button} onClick={() => setMode('favorites')}>Favourite</button>
                     <button className={styles.button} onClick={() => setMode('top_tradet')}>Top Tradet</button>
                     <button className={styles.button} onClick={() => setMode('top_gainers')}>Top gainers</button>
-                    <button className={styles.button} onClick={() => setMode('top_loosers')}>Top loosers</button>
-                    <button className={styles.button} onClick={() => setMode('newly_listed')}>Newly listed</button>
+                    <button className={styles.button} onClick={() => setMode('top_losers')}>Top loosers</button>
+                    <button className={styles.button} onClick={() => setMode('new_listings')}>Newly listed</button>
                 </div>
             </div>
             {/* Loading indicator */}
@@ -95,7 +43,7 @@ const BasicInformation = (uid) => {
                         <div className={styles.loading_pills}></div>
                     </div>
             }
-            {error && <p className={styles.error}>Error: {error.message}</p>}
+            {error && <p className={styles.error}>{error.message}</p>}
 
             
             {/* Table header columns */}
@@ -121,8 +69,8 @@ const BasicInformation = (uid) => {
                             </tr>
                         ):(
                             
-                            visibleData.map((item, idx) => ( 
-                               <tr key={idx} className={styles.row}>
+                            visibleData.map((item) => ( 
+                               <tr key={item.id} className={styles.row}>
                                     <td ><div className={styles.row_asset_div}>
                                         <img src={item.image} alt={item.name} className={styles.row_asset_img} />
                                         <div className={styles.row_asset_info}>
@@ -130,16 +78,14 @@ const BasicInformation = (uid) => {
                                             <span>{item.symbol}</span>
                                         </div>    
                                     </div></td>
-                                    <td>{item.current_price}</td>
+                                    <td>{item.current_price} $</td>
                                     <td>{item.price_change_percentage_24h} %</td>
                                     <td>{item.market_cap_change_percentage_24h} %</td>
                                     <td className={styles.row_volume}>
                                         <div className={styles.row_volume_wrapper}>
                                            {item.total_volume}
                                            {mode === 'favorites' && 
-                                                <div className={styles.row_volume_button}>
-                                                    <button className={styles.row_button_favorite} onClick={() => {toggleFavorite(item.id)}}>{item.favorite ? <MdFavorite /> : <MdFavoriteBorder />}</button>
-                                                </div>
+                                                <ToggleFavorite item_id={item.id}/>
                                            }
                                         </div>
                                     </td>
@@ -151,9 +97,11 @@ const BasicInformation = (uid) => {
                 </table>
 
                 {/* Show more button */}
-                {!loading && !error && data.length !== 0 && rowsToShow < data.length  (
+                {!loading && !error && data.length !== 0 &&  (
                     <div className={styles.show_more_container}>
-                        <button className={styles.show_more_button} onClick={rowsToShow > 4 ? () => setRowsToShow(rowsToShow + 6) : () => setRowsToShow(rowsToShow-6)}>Show More</button>
+                        <button className={styles.show_more_button} onClick={() => setRowsToShow(prev => prev === 4 ? data.length : 4)}>
+                            {rowsToShow === 4 ? 'Show more' : ' Show less'}
+                        </button>
                     </div>
                 )}
             </>)}
